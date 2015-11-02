@@ -24,6 +24,21 @@ class DocumentType:
             return DocumentType.SAMPLE
         elif ( DocumentType.TRAIN_STR in filename ):
             return DocumentType.TRAIN
+        
+    '''
+    Converts a document type ID to a string. If the ID is 0, then
+    "sample" will be returned, and if the ID is 1, then "train"
+    will be returned. Otherwise, "?" will be returned if the ID
+    is not known.
+    '''
+    @staticmethod
+    def convertTypeToString( documentType ):
+        if ( documentType == DocumentType.SAMPLE ):
+            return DocumentType.SAMPLE_STR
+        elif ( documentType == DocumentType.TRAIN ):
+            return DocumentType.TRAIN_STR
+        
+        return "?"
 
 '''
 Represents a word document.
@@ -109,7 +124,7 @@ class Document( object ):
             initialText = "{" + initialText.strip() + "}"
             
         return "Document[ ProblemId=" + str( self._problemId ) + \
-            " , DocumentType=" + str( self._docType ) + \
+            " , DocumentType=" + DocumentType.convertTypeToString( self._docType ) + \
             " , DocumentNumber=" + str( self._docNum ) + \
             " , AuthorId=" + str( self._authorId ) + \
             " , Text=" + str( initialText ) +\
@@ -121,9 +136,18 @@ Unit testing
 '''
 def main():
     doc1 = Document.createDocument( "problemset/problemA/" , "Asample02.txt" )
-    doc2 = Document.createDocument( "problemset/problemA/" , "Atrain01-1.txt" )
     print doc1
+    
+    doc2 = Document.createDocument( "problemset/problemA/" , "Atrain01-1.txt" )
     print doc2
-    pass
+    
+    doc3 = Document.createDocument( "problemset/problemA/" , "Atrain03-3.txt" )
+    print doc3
+    
+    doc4 = Document.createDocument( "problemset/problemB/" , "Bsample13.txt" )
+    print doc4
+    
+    doc5 = Document.createDocument( "problemset/problemM/" , "Msample10.txt" )
+    print doc5
 
 if __name__ == "__main__" : main()
