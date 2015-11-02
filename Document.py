@@ -113,6 +113,16 @@ class Document( object ):
         return self._docType
     
     '''
+    Returns the ID of this author minus 1. We subtract 1 so that
+    we can still have 0-indexed arrays.
+    '''
+    def getAuthorId( self ):
+        return self._authorId-1
+    
+    def containsStopword( self , stopword ):
+        return stopword in self._tokens
+    
+    '''
     Reports the textual representation of this document for debugging purposes. 
     Only the first 10 tokens of the text will be shown to limit output size.
     '''
