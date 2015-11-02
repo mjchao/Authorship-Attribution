@@ -63,7 +63,8 @@ def main():
     
     attributor = Attributor( trainDocs , sampleDocs , stopwords )
     attributor.train()
-    
+    attributor.classify()
+    attributor.printResults()
 
 
 if __name__ == "__main__" : main()

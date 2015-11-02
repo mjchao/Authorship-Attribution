@@ -36,7 +36,6 @@ class Attributor( object ):
          
         #compute P(c)   
         self._categoryProbability = 1.0 * categoryOccurrences / len( self._classified )
-        print self._categoryProbability
         
         #compute number of documents with class label c that contain each stop word
         stopWordOccurrences = numpy.zeros( (len( self._stopwords ) , self._numLabels ) , numpy.int32 )
@@ -45,10 +44,9 @@ class Attributor( object ):
                 if ( doc.containsStopword( self._stopwords[ i ] ) ):
                     stopWordOccurrences[ i ][ doc.getAuthorId() ] += 1
         
-        #calculate the probabiliy of a given stop word appearing in a document with a given author
+        #calculate the probability of a given stop word appearing in a document with a given author
         #using equation 6 in the spec
-        self._stopWordProbabilityGivenCategory = (1.0 * stopWordOccurrences + 1) / (numpy.array( [categoryOccurrences] * len(self._stopwords) ))
-        
+        self._stopWordProbabilityGivenCategory = (1.0 * stopWordOccurrences + 1) / (numpy.array( [categoryOccurrences] * len(self._stopwords) ) + 2)
         '''Generalized formula
         for i in range( len( self._stopwords ) ):
             for c in range( self._numLabels ):
@@ -56,8 +54,13 @@ class Attributor( object ):
         ''' 
     
     def classify( self ):
-        #self._classification = 
-        pass
+        self._classifications = numpy.array([-1] * len( self._unclassified ))
+        for i in range( len(self._unclassified) ):
+            enableFeature = numpy.array([[ 1 if self._unclassified[ i ].containsStopword(x) else 0 for x in self._stopwords ]])
+            #print enableFeature
+            labelProbabilities = numpy.log2( self._categoryProbability ) + sum( numpy.dot( enableFeature , numpy.log2(self._stopWordProbabilityGivenCategory)) )
+            self._classifications[ i ] = numpy.argmax( labelProbabilities )
     
     def printResults( self ):
+        print self._classifications + 1
         pass
