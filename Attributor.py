@@ -57,10 +57,12 @@ class Attributor( object ):
         self._classifications = numpy.array([-1] * len( self._unclassified ))
         for i in range( len(self._unclassified) ):
             enableFeature = numpy.array([[ 1 if self._unclassified[ i ].containsStopword(x) else 0 for x in self._stopwords ]])
-            #print enableFeature
-            labelProbabilities = numpy.log2( self._categoryProbability ) + sum( numpy.dot( enableFeature , numpy.log2(self._stopWordProbabilityGivenCategory)) )
-            self._classifications[ i ] = numpy.argmax( labelProbabilities )
+            labelProbabilities = numpy.log2( self._categoryProbability ) + numpy.dot( enableFeature , numpy.log2(self._stopWordProbabilityGivenCategory))
+            
+            #have to add 1 because our authorIDs have been subtracted by 1
+            self._classifications[ i ] = numpy.argmax( labelProbabilities ) + 1
     
     def printResults( self ):
-        print self._classifications + 1
+        print "Number of authors:" , self._numLabels
+        print self._classifications
         pass
