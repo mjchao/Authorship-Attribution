@@ -109,6 +109,9 @@ class Document( object ):
         lowercased = punctuation_removed.lower()
         return lowercased.split()
     
+    def getDocumentType( self ):
+        return self._docType
+    
     '''
     Reports the textual representation of this document for debugging purposes. 
     Only the first 10 tokens of the text will be shown to limit output size.
