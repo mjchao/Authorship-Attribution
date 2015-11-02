@@ -90,6 +90,7 @@ class Document( object ):
         with open( directory + fileWithExtension , "r" ) as f:
             content = f.read()
             
+        content = re.sub( '[^0-9a-zA-Z]+', ' ', content )
         return Document( problemId , documentType , documentNumber , authorId , content )
 
     '''
