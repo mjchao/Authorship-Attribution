@@ -56,10 +56,15 @@ class Attributor( object ):
     def classify( self ):
         self._classifications = numpy.array([-1] * len( self._unclassified ))
         for i in range( len(self._unclassified) ):
-            enableFeature = numpy.array([[ 1 if self._unclassified[ i ].containsStopword(x) else 0 for x in self._stopwords ]])
-            labelProbabilities = numpy.log2( self._categoryProbability ) + numpy.dot( enableFeature , numpy.log2(self._stopWordProbabilityGivenCategory))
             
-            #have to add 1 because our authorIDs have been subtracted by 1
+            #decide whether we use P(f|c)) or 1 - P(f|c)
+            featureProbability = numpy.array( [ self._stopWordProbabilityGivenCategory[ j ][ : ] if self._unclassified[ i ].containsStopword( self._stopwords[j] ) else \
+                                               1.0 - self._stopWordProbabilityGivenCategory[ j ][ : ] \
+                                               for j in range(len(self._stopwords)) ] )
+            
+            #then add those values
+            logProbabilitiesSum = numpy.log2( self._categoryProbability ) + numpy.log2(featureProbability)
+            labelProbabilities = numpy.sum( logProbabilitiesSum , axis=0 )
             self._classifications[ i ] = numpy.argmax( labelProbabilities ) + 1
     
     def printResults( self ):
