@@ -29,15 +29,18 @@ class Attributor( object ):
     Trains the classifier.
     '''  
     def train( self ):
+        
+        #compute N_c, the number of documents provided for each author
         authorIds = [ doc.getAuthorId() for doc in self._classified ]
         categoryOccurrences = numpy.array([ 0 for _ in range( 0 , self._numLabels ) ] )
         for authorId in authorIds:
             categoryOccurrences[ authorId ] += 1
          
-        #compute P(c)   
+        #compute P(c), the prior probability that any random document is
+        #written by each author   
         self._categoryProbability = 1.0 * categoryOccurrences / len( self._classified )
         
-        #compute number of documents with class label c that contain each stop word
+        #compute N_ci, the number of documents with class label c that contain each stop word
         stopWordOccurrences = numpy.zeros( (len( self._stopwords ) , self._numLabels ) , numpy.int32 )
         for doc in self._classified:
             for i in range( len( self._stopwords ) ):
@@ -47,25 +50,46 @@ class Attributor( object ):
         #calculate the probability of a given stop word appearing in a document with a given author
         #using equation 6 in the spec
         self._stopWordProbabilityGivenCategory = (1.0 * stopWordOccurrences + 1) / (numpy.array( [categoryOccurrences] * len(self._stopwords) ) + 2)
-        '''Generalized formula
-        for i in range( len( self._stopwords ) ):
-            for c in range( self._numLabels ):
-                stopWordProbabilityGivenCategory[ i ][ c ] = (stopWordOccurrences[ i ][ c ] + 1)/(occurrencesPerCategory[ c ] + self._numLabels)
-        ''' 
     
+    '''
+    Looks at all the unclassified documents and tries to determine the author
+    that wrote the document 
+    '''
     def classify( self ):
         self._classifications = numpy.array([-1] * len( self._unclassified ))
+        
+        #classify every document
         for i in range( len(self._unclassified) ):
             
-            #decide whether we use P(f|c)) or 1 - P(f|c)
-            featureProbability = numpy.array( [ self._stopWordProbabilityGivenCategory[ j ][ : ] if self._unclassified[ i ].containsStopword( self._stopwords[j] ) else \
-                                               1.0 - self._stopWordProbabilityGivenCategory[ j ][ : ] \
-                                               for j in range(len(self._stopwords)) ] )
+            #Determine the probability of each feature occurring.
+            #Each feature is either the occurrence or the non-occurrence
+            #of the stop word. 
+            #
+            #If the feature is the occurrence of the stop word
+            #(i.e. the stop word appears in the document), then the probability
+            #of that feature is the posterior probability that the stop word
+            #appearing in the document given its author: P(f|c).
+            #
+            #If the feature is the non-occurrence of the stop word
+            #(i.e. the stop word does not appear in the document), then the
+            #probability of that feature is the posterior probability that the
+            #stop word does not appear in the document given its author: 1 - P(f|c)
+            featureProbabilityGivenCategory = numpy.array( [ (self._stopWordProbabilityGivenCategory[ j ][ : ]) if self._unclassified[ i ].containsStopword( self._stopwords[j] ) \
+                                                        else (1.0 - self._stopWordProbabilityGivenCategory[ j ][ : ]) \
+                                                        for j in range(len(self._stopwords)) ] )
             
-            #then add those values
-            logProbabilitiesSum = numpy.log2( self._categoryProbability ) + numpy.log2(featureProbability)
-            labelProbabilities = numpy.sum( logProbabilitiesSum , axis=0 )
-            self._classifications[ i ] = numpy.argmax( labelProbabilities ) + 1
+            #Then multiply together the posterior probabilities of seeing each feature given
+            #each category. This product is the likelihood that the given author is the true
+            #author of the document.
+            #s
+            #Since the calculation might underflow, we instead add up the logs of those
+            #probabilities instead. 
+            labelScore = numpy.sum( numpy.log2(self._categoryProbability) + numpy.log2(featureProbabilityGivenCategory) , axis=0 )
+            
+            #We declare the most likely author of the document. 
+            #This is done by taking the argmax over the probabilities 
+            #of each author being the true author of the document.
+            self._classifications[ i ] = numpy.argmax( labelScore ) + 1
     
     def printResults( self ):
         print "Number of authors:" , self._numLabels
