@@ -9,9 +9,6 @@ import os
 from Document import Document , DocumentType
 from Attributor import Attributor
 
-def run():
-    pass
-
 '''
 Creates Document objects to represent all the documents in a given
 directory that are named properly.
@@ -46,21 +43,12 @@ def main():
     documentList = createDocuments( sys.argv[ 1 ] )
     trainDocs = documentList[ 0 ]
     sampleDocs = documentList[ 1 ]
-    
-    print "Found" , len( trainDocs ) , "training documents and" , len( sampleDocs ) , "sample documents"
-    print "Training Documents:"
-    for doc in trainDocs:
-        print doc
-        
-    print ""
-    print "Sample Documents:"
-    for doc in sampleDocs:
-        print doc
         
     #read in stopwords
     with open( "stopwords.txt" , "r" ) as f:
         stopwords = Document.tokenize( f.read() )
     
+    #classify the documents with missing authors
     attributor = Attributor( trainDocs , sampleDocs , stopwords )
     attributor.train()
     attributor.classify()
