@@ -56,8 +56,8 @@ def main():
     
     writeup = Writeup()
     results = attributor.get_results()
-    print results
     writeup.print_accuracy( sampleDocs , results )
+    writeup.print_confusion_matrix( sampleDocs , results )
     
 
 
