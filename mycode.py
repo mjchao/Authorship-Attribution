@@ -6,6 +6,7 @@ Created on Nov 2, 2015
 
 import sys
 import os
+import matplotlib.pyplot as plt
 from Document import Document , DocumentType
 from Attributor import Attributor
 from Writeup import Writeup
@@ -57,12 +58,42 @@ def main():
     writeup = Writeup()
     results = attributor.get_results()
     writeup.print_accuracy( sampleDocs , results )
+    
     writeup.print_confusion_matrix( sampleDocs , results )
     
     print
     print
-    rankings = attributor.get_feature_ranking()
-    print "Feature Rankings:" , rankings[0:20]
+    featureRankings = attributor.get_feature_ranking()
+    print "Feature ranking:"
+    for i in range( 0 , 20 ):
+        print featureRankings[ i ][ 0 ] , featureRankings[ i ][ 1 ]
+    
+    print 
+    print
+    featureFrequencies = attributor.get_feature_frequencies()
+    featurePlotDataX = []
+    featurePlotDataY = []
+    for numFeatures in range(10,len(featureFrequencies)+1,10):
+        newStopwords = [ featureFrequencies[ i ][ 0 ] for i in range( 0 , numFeatures ) ]
+        newAttributor = Attributor( trainDocs , sampleDocs , newStopwords )
+        newAttributor.train()
+        newAttributor.classify()
+        newResults = newAttributor.get_results()
+        accuracy = writeup.get_accuracy( sampleDocs , newResults )
+        featurePlotDataX.append( numFeatures )
+        featurePlotDataY.append( accuracy )
+        
+    print "Feature curve:"
+    for i in range(len(featurePlotDataX)):
+        print featurePlotDataX[ i ] , featurePlotDataY[ i ]
+        
+    plt.plot( featurePlotDataX , featurePlotDataY )
+    plt.xlabel( "Number of Features" )
+    plt.ylabel( "Accuracy" )
+    plt.title( "Accuracy vs. Number of Features" )
+    plt.show()
+    
+    
     
     
 

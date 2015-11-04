@@ -25,23 +25,29 @@ class Writeup( object ):
                         authorId = int(authorName[ (pathname.find( "Author") + len( "Author")+1) : ])
     
                     self._correctClassifications[ (problemId , docNum) ] = authorId
-                    
-    
-    def print_accuracy( self , documents , classifications ):
+          
+    def get_accuracy( self , documents , classifications ): 
         correct = 0
         total = len( documents )
         for i in range(len(documents)):
             doc = documents[ i ]
             if self._correctClassifications[ (doc.get_problem_id() , doc.get_document_num()) ] == classifications[ i ]:
-                correct += 1
-
-        print "Accuracy:" , 1.0 * correct / total
+                correct += 1  
+                
+        return 1.0 * correct / total    
+    
+    def print_accuracy( self , documents , classifications ):
+        print "Accuracy:"
+        print self.get_accuracy( documents , classifications )
         
     def print_confusion_matrix( self , documents , classifications ):
         actual = []
         for doc in documents:
             actual.append( self._correctClassifications[ (doc.get_problem_id() , doc.get_document_num()) ] )
             
+        print
+        print
+        print "Confusion Matrix:"
         Writeup.printConfMat( actual , classifications )
         
         
@@ -60,8 +66,7 @@ class Writeup( object ):
         assert(len(actual) == len(predicted))
         confmat = {}  ## Confusion Matrix
         for i,a in enumerate(actual): confmat[(a, predicted[i])] = confmat.get((a, predicted[i]), 0) + 1
-        print
-        print
+
         print "0",  ## Actual labels column (aka first column)
         for label2 in all_labels:
             print label2,

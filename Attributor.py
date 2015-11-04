@@ -102,4 +102,21 @@ class Attributor( object ):
             
         rankings.sort( cmp=lambda x,y: 1 if x[1] < y[1] else -1 )
         return rankings
+    
+    def get_feature_frequencies( self ):
+        frequencies = []
+        for word in self._stopwords:
+            count = 0
+            for doc in self._classified:
+                if ( doc.contains_stopword( word )):
+                    count += 1
+                
+            frequencies.append(1.0 * count / len( self._classified ))
+            
+        rankings = []
+        for i in range( len(frequencies) ):
+            rankings.append( (self._stopwords[ i ] , frequencies[ i ]) )
+            
+        rankings.sort( cmp=lambda x,y: 1 if x[1]<y[1] else -1 )
+        return rankings
         
