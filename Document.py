@@ -19,7 +19,7 @@ class DocumentType:
     or "train" and receives an ID 0 or 1, respectively.
     '''
     @staticmethod
-    def getDocumentType( filename ):
+    def get_document_type( filename ):
         if ( DocumentType.SAMPLE_STR in filename ):
             return DocumentType.SAMPLE
         elif ( DocumentType.TRAIN_STR in filename ):
@@ -66,7 +66,7 @@ class Document( object ):
         #remove the extension from the file to get the filename
         filename = fileWithExtension[ 0 : fileWithExtension.find( "." ) ]
         problemId = filename[ 0 ]
-        documentType = DocumentType.getDocumentType( filename )
+        documentType = DocumentType.get_document_type( filename )
         
         documentNumber = -1
         authorId = -1
@@ -109,17 +109,22 @@ class Document( object ):
         lowercased = punctuation_removed.lower()
         return lowercased.split()
     
-    def getDocumentType( self ):
+    def get_document_type( self ):
         return self._docType
     
+    def get_document_num(self):
+        return self._docNum
+    
+    def get_problem_id(self):
+        return self._problemId
     '''
     Returns the ID of this author minus 1. We subtract 1 so that
     we can still have 0-indexed arrays.
     '''
-    def getAuthorId( self ):
+    def get_author_id( self ):
         return self._authorId-1
     
-    def containsStopword( self , stopword ):
+    def contains_stopword( self , stopword ):
         return stopword in self._tokens
     
     '''

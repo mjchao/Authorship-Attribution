@@ -22,7 +22,7 @@ class Attributor( object ):
         
         #we'll assume that the number of labels will just be the maximum authorId
         #in our training data
-        self._numLabels = max( [ doc.getAuthorId() for doc in classifiedDocuments ] ) + 1
+        self._numLabels = max( [ doc.get_author_id() for doc in classifiedDocuments ] ) + 1
         
       
     '''
@@ -31,7 +31,7 @@ class Attributor( object ):
     def train( self ):
         
         #compute N_c, the number of documents provided for each author
-        authorIds = [ doc.getAuthorId() for doc in self._classified ]
+        authorIds = [ doc.get_author_id() for doc in self._classified ]
         categoryOccurrences = numpy.array([ 0 for _ in range( 0 , self._numLabels ) ] )
         for authorId in authorIds:
             categoryOccurrences[ authorId ] += 1
@@ -44,8 +44,8 @@ class Attributor( object ):
         stopWordOccurrences = numpy.zeros( (len( self._stopwords ) , self._numLabels ) , numpy.int32 )
         for doc in self._classified:
             for i in range( len( self._stopwords ) ):
-                if ( doc.containsStopword( self._stopwords[ i ] ) ):
-                    stopWordOccurrences[ i ][ doc.getAuthorId() ] += 1
+                if ( doc.contains_stopword( self._stopwords[ i ] ) ):
+                    stopWordOccurrences[ i ][ doc.get_author_id() ] += 1
         
         #calculate the probability of a given stop word appearing in a document with a given author
         #using equation 6 in the spec
@@ -74,7 +74,7 @@ class Attributor( object ):
             #(i.e. the stop word does not appear in the document), then the
             #probability of that feature is the posterior probability that the
             #stop word does not appear in the document given its author: 1 - P(f|c)
-            featureProbabilityGivenCategory = numpy.array( [ (self._stopWordProbabilityGivenCategory[ j ][ : ]) if self._unclassified[ i ].containsStopword( self._stopwords[j] ) \
+            featureProbabilityGivenCategory = numpy.array( [ (self._stopWordProbabilityGivenCategory[ j ][ : ]) if self._unclassified[ i ].contains_stopword( self._stopwords[j] ) \
                                                         else (1.0 - self._stopWordProbabilityGivenCategory[ j ][ : ]) \
                                                         for j in range(len(self._stopwords)) ] )
             
@@ -91,7 +91,5 @@ class Attributor( object ):
             #of each author being the true author of the document.
             self._classifications[ i ] = numpy.argmax( labelScore ) + 1
     
-    def printResults( self ):
-        print "Number of authors:" , self._numLabels
-        print self._classifications
-        pass
+    def get_results( self ):
+        return self._classifications

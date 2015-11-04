@@ -8,6 +8,7 @@ import sys
 import os
 from Document import Document , DocumentType
 from Attributor import Attributor
+from Writeup import Writeup
 
 '''
 Creates Document objects to represent all the documents in a given
@@ -23,9 +24,9 @@ def createDocuments( directory  ):
     for filename in filenames:
         newDocument = Document.createDocument( directory , filename )
         try:
-            if ( newDocument.getDocumentType() == DocumentType.SAMPLE ):
+            if ( newDocument.get_document_type() == DocumentType.SAMPLE ):
                 sampleDocs.append( newDocument )
-            elif ( newDocument.getDocumentType() == DocumentType.TRAIN ):
+            elif ( newDocument.get_document_type() == DocumentType.TRAIN ):
                 trainDocs.append( newDocument )
             else:
                 print "The following document could not be parsed: " + directory + filename
@@ -52,7 +53,12 @@ def main():
     attributor = Attributor( trainDocs , sampleDocs , stopwords )
     attributor.train()
     attributor.classify()
-    attributor.printResults()
+    
+    writeup = Writeup()
+    results = attributor.get_results()
+    print results
+    writeup.print_accuracy( sampleDocs , results )
+    
 
 
 if __name__ == "__main__" : main()
