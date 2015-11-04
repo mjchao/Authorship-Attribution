@@ -91,6 +91,7 @@ def main():
     plt.xlabel( "Number of Features" )
     plt.ylabel( "Accuracy" )
     plt.title( "Accuracy vs. Number of Features" )
+    plt.axis( [0, 450, -0.1, 1.1] )
     plt.show()
     
     
