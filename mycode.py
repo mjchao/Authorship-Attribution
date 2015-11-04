@@ -59,6 +59,12 @@ def main():
     writeup.print_accuracy( sampleDocs , results )
     writeup.print_confusion_matrix( sampleDocs , results )
     
+    print
+    print
+    rankings = attributor.get_feature_ranking()
+    print "Feature Rankings:" , rankings[0:20]
+    
+    
 
 
 if __name__ == "__main__" : main()

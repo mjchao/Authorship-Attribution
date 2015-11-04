@@ -74,7 +74,7 @@ class Attributor( object ):
             #(i.e. the stop word does not appear in the document), then the
             #probability of that feature is the posterior probability that the
             #stop word does not appear in the document given its author: 1 - P(f|c)
-            featureProbabilityGivenCategory = numpy.array( [ (self._stopWordProbabilityGivenCategory[ j ][ : ]) if self._unclassified[ i ].contains_stopword( self._stopwords[j] ) \
+            self._featureProbabilityGivenCategory = numpy.array( [ (self._stopWordProbabilityGivenCategory[ j ][ : ]) if self._unclassified[ i ].contains_stopword( self._stopwords[j] ) \
                                                         else (1.0 - self._stopWordProbabilityGivenCategory[ j ][ : ]) \
                                                         for j in range(len(self._stopwords)) ] )
             
@@ -84,7 +84,7 @@ class Attributor( object ):
             #s
             #Since the calculation might underflow, we instead add up the logs of those
             #probabilities instead. 
-            labelScore = numpy.sum( numpy.log2(self._categoryProbability) + numpy.log2(featureProbabilityGivenCategory) , axis=0 )
+            labelScore = numpy.sum( numpy.log2(self._categoryProbability) + numpy.log2(self._featureProbabilityGivenCategory) , axis=0 )
             
             #We declare the most likely author of the document. 
             #This is done by taking the argmax over the probabilities 
@@ -93,3 +93,13 @@ class Attributor( object ):
     
     def get_results( self ):
         return self._classifications
+    
+    def get_feature_ranking( self ):
+        classConditionalEntropy = -1.0 * numpy.sum( self._categoryProbability * self._featureProbabilityGivenCategory * numpy.log( self._featureProbabilityGivenCategory ) , axis=1)
+        rankings = []
+        for i in range(len(classConditionalEntropy)):
+            rankings.append( (self._stopwords[ i ] , classConditionalEntropy[ i ]) )
+            
+        rankings.sort( cmp=lambda x,y: 1 if x[1] < y[1] else -1 )
+        return rankings
+        
