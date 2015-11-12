@@ -95,7 +95,7 @@ class Attributor( object ):
         return self._classifications
     
     def get_feature_ranking( self ):
-        classConditionalEntropy = -1.0 * numpy.sum( self._categoryProbability * self._featureProbabilityGivenCategory * numpy.log( self._featureProbabilityGivenCategory ) , axis=1)
+        classConditionalEntropy = -1.0 * numpy.sum( self._categoryProbability * self._featureProbabilityGivenCategory * numpy.log2( self._featureProbabilityGivenCategory ) , axis=1)
         rankings = []
         for i in range(len(classConditionalEntropy)):
             rankings.append( (self._stopwords[ i ] , classConditionalEntropy[ i ]) )
