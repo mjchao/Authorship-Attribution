@@ -62,13 +62,10 @@ def main():
     writeup.print_confusion_matrix( sampleDocs , results )
     
     print
-    print
     featureRankings = attributor.get_feature_ranking()
-    print "Feature ranking:"
     for i in range( 0 , 20 ):
         print featureRankings[ i ][ 0 ] , featureRankings[ i ][ 1 ]
     
-    print 
     print
     featureFrequencies = attributor.get_feature_frequencies()
     featurePlotDataX = []

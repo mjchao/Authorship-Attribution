@@ -90,7 +90,9 @@ class Document( object ):
         with open( directory + fileWithExtension , "r" ) as f:
             content = f.read()
 
-        return Document( problemId , documentType , documentNumber , authorId , content )
+        rtn = Document( problemId , documentType , documentNumber , authorId , content )
+        rtn._filename = fileWithExtension
+        return rtn
 
     '''
     Removes leading, trailing, and extra spaces from a string
