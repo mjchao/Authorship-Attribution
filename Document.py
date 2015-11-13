@@ -55,7 +55,6 @@ class Document( object ):
         self._authorId = authorId
         self._text = text
         self._tokens = Document.tokenize( text )
-        print "youngest" in self._tokens
        
     '''
     Returns a document object that represents the text document

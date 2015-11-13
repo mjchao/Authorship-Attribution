@@ -113,10 +113,6 @@ class Attributor( object ):
                 cce += self._categoryProbability[ c ] * self._featureProbabilityGivenCategory[ i ][ c ] * numpy.log2( self._featureProbabilityGivenCategory[ i ][ c ] )
             rankings.append( (self._stopwords[ i ] , -1*cce) )
             
-            if ( self._stopwords[ i ] == 'z' ):
-                print cce
-                print self._featureProbabilityGivenCategory[ i ][ : ]
-            
         rankings.sort( key = lambda x : -1*x[1] )
         return rankings
     
