@@ -46,7 +46,7 @@ class Attributor( object ):
             for i in range( len( self._stopwords ) ):
                 if ( doc.contains_stopword( self._stopwords[ i ] ) ):
                     stopWordOccurrences[ i ][ doc.get_author_id() ] += 1
-        
+
         #calculate the probability of a given stop word appearing in a document with a given author
         #using equation 6 in the spec
         self._stopWordProbabilityGivenCategory = (1.0 * stopWordOccurrences + 1) / (numpy.array( [categoryOccurrences] * len(self._stopwords) ) + 2)
@@ -95,12 +95,29 @@ class Attributor( object ):
         return self._classifications
     
     def get_feature_ranking( self ):
-        classConditionalEntropy = -1.0 * numpy.sum( self._categoryProbability * self._featureProbabilityGivenCategory * numpy.log2( self._featureProbabilityGivenCategory ) , axis=1)
+        '''
+        categoryProbabilityRep = numpy.tile( self._categoryProbability , (len( self._stopwords ) , 1) )
+        classConditionalEntropy = -1.0 * numpy.sum( categoryProbabilityRep * self._featureProbabilityGivenCategory * numpy.log2( self._featureProbabilityGivenCategory ) , axis=1)
         rankings = []
-        for i in range(len(classConditionalEntropy)):
+        for i in range(len(self._stopwords)):
+            if ( self._stopwords[ i ] == 'everyone' ):
+                print self._categoryProbability
+                print self._featureProbabilityGivenCategory[ i ][ : ]
+                print classConditionalEntropy[ i ]
             rankings.append( (self._stopwords[ i ] , classConditionalEntropy[ i ]) )
+        '''
+        rankings = []
+        for i in range( len(self._stopwords)):
+            cce = 0.0
+            for c in range( len(self._categoryProbability)):
+                cce += self._categoryProbability[ c ] * self._featureProbabilityGivenCategory[ i ][ c ] * numpy.log2( self._featureProbabilityGivenCategory[ i ][ c ] )
+            rankings.append( (self._stopwords[ i ] , -1*cce) )
             
-        rankings.sort( cmp=lambda x,y: 1 if x[1] < y[1] else -1 )
+            if ( self._stopwords[ i ] == 'z' ):
+                print cce
+                print self._featureProbabilityGivenCategory[ i ][ : ]
+            
+        rankings.sort( key = lambda x : -1*x[1] )
         return rankings
     
     def get_feature_frequencies( self ):

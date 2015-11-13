@@ -37,8 +37,10 @@ class Writeup( object ):
         return 1.0 * correct / total    
     
     def print_accuracy( self , documents , classifications ):
-        print "Accuracy:"
-        print self.get_accuracy( documents , classifications )
+        for i in range(0, len(classifications)):
+            print documents[ i ]._filename, classifications[ i ]
+        print
+        print len(classifications) , "authors gives" , 100.0*self.get_accuracy( documents , classifications ) , "% accuracy"
         
     def print_confusion_matrix( self , documents , classifications ):
         actual = []
@@ -46,8 +48,6 @@ class Writeup( object ):
             actual.append( self._correctClassifications[ (doc.get_problem_id() , doc.get_document_num()) ] )
             
         print
-        print
-        print "Confusion Matrix:"
         Writeup.printConfMat( actual , classifications )
         
         
