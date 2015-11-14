@@ -95,24 +95,13 @@ class Attributor( object ):
         return self._classifications
     
     def get_feature_ranking( self ):
-        '''
+        
         categoryProbabilityRep = numpy.tile( self._categoryProbability , (len( self._stopwords ) , 1) )
-        classConditionalEntropy = -1.0 * numpy.sum( categoryProbabilityRep * self._featureProbabilityGivenCategory * numpy.log2( self._featureProbabilityGivenCategory ) , axis=1)
+        classConditionalEntropy = -1.0 * numpy.sum( categoryProbabilityRep * self._stopWordProbabilityGivenCategory * numpy.log2( self._stopWordProbabilityGivenCategory ) , axis=1)
         rankings = []
         for i in range(len(self._stopwords)):
-            if ( self._stopwords[ i ] == 'everyone' ):
-                print self._categoryProbability
-                print self._featureProbabilityGivenCategory[ i ][ : ]
-                print classConditionalEntropy[ i ]
             rankings.append( (self._stopwords[ i ] , classConditionalEntropy[ i ]) )
-        '''
-        rankings = []
-        for i in range( len(self._stopwords)):
-            cce = 0.0
-            for c in range( len(self._categoryProbability)):
-                cce += self._categoryProbability[ c ] * self._featureProbabilityGivenCategory[ i ][ c ] * numpy.log2( self._featureProbabilityGivenCategory[ i ][ c ] )
-            rankings.append( (self._stopwords[ i ] , -1*cce) )
-            
+      
         rankings.sort( key = lambda x : -1*x[1] )
         return rankings
     
